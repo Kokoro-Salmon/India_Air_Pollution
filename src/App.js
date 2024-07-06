@@ -10,7 +10,7 @@ import coordinateJSON from './coordinates.json'
 mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 
 
-mapboxgl.accessToken = "pk.eyJ1Ijoia29rb3JvLXNhbG1vbiIsImEiOiJjbHhxZGU1cngwNXN0MnZzZG00a3A4eXRmIn0.92W8d5GtiMx38UZUZD4Atw";
+mapboxgl.accessToken = process.env.REACT_APP_MAPBOX;
 
 
 
@@ -55,8 +55,8 @@ function App() {
   useEffect(() => {
     const fetchPollutionData = async () => {
       try {
-
-        let res = await axios.get('https://api.data.gov.in/resource/3b01bcb8-0b14-4abf-b6f2-c1bfd384ba69?format=json&offset=0&limit=10000&api-key=579b464db66ec23bdd000001935730ca3ebc41b075b1e831b540250a')
+        const apiKey = process.env.REACT_APP_GOV;
+        let res = await axios.get(`https://api.data.gov.in/resource/3b01bcb8-0b14-4abf-b6f2-c1bfd384ba69?format=json&offset=0&limit=10000&api-key=${apiKey}`);
         res = res.data.records
         let mp = new Map()
         let arr = []
@@ -243,36 +243,36 @@ function App() {
 
   const printArr = (arr) => {
     let str
-    for(let i=0; i<arr.length; i++) {
-      if(!arr[i] || !arr[i].pollutant_id || !arr[i].pollutant_avg) continue 
-      str+=arr[i].pollutant_id
-      str+=':'
-      str+=arr[i].pollutant_avg
-      str+=' | '
+    for (let i = 0; i < arr.length; i++) {
+      if (!arr[i] || !arr[i].pollutant_id || !arr[i].pollutant_avg) continue
+      str += arr[i].pollutant_id
+      str += ':'
+      str += arr[i].pollutant_avg
+      str += ' | '
     }
     str = str.split('d')[2]
-    return str.slice(0,-2)
+    return str.slice(0, -2)
   }
 
   return (
     <div className="App">
-      {(!showCard||!properties) && <div className="sidebar">
-        Air Quality Index 
-        <br/>
+      {(!showCard || !properties) && <div className="sidebar">
+        Air Quality Index
+        <br />
         (Hover/Click on any Location for Details)
-        <br/>
+        <br />
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
       </div>}
 
-        {showCard && properties && <div className="sidebar">
-          {properties.place}
-          <br />
-          {'Last Update: ' + properties.last_update}
-          <br />
-          {printArr(properties.pollutants)}
-          
+      {showCard && properties && <div className="sidebar">
+        {properties.place}
+        <br />
+        {'Last Update: ' + properties.last_update}
+        <br />
+        {printArr(properties.pollutants)}
 
-        </div>}
+
+      </div>}
 
 
       <div ref={mapContainer} className="map-container" />
